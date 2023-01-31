@@ -35,7 +35,7 @@ else
    Zoomed_Im = importfile(file);
 end
 clear file path
-
+cd(StartingFolder) %return
 dummy.half_size = 300; %assume that the sample is in the middle 600 pixels of the image
 dummy.middle = round(size(Zoomed_Im,2)./2)-dummy.half_size:round(size(Zoomed_Im,2)./2)+dummy.half_size;
 check.Sample_Zoomwidth = ECFedgefit(Zoomed_Im,1,dummy.middle);
