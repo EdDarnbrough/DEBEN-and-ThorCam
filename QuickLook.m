@@ -73,18 +73,18 @@ title('Measurements made on each processed frame')
 ylabel('Distance in pixels')
 xlabel('Experiment time (s)')
 
-%% Looking to isolate the erronous values
+%% Looking to isolate the erronous values - not needed
 
-dummy.jump = 20; %Number of pixels above which is considered a jump between frames
-dummy.JumpUp = find((gradient(Gap(Times)))>dummy.jump)+1;
-dummy.JumpUp = [dummy.JumpUp, find((-gradient(Gap(Times)))>dummy.jump)-1;];
-[C,ai,ci]= unique(dummy.JumpUp);
-a_counts = accumarray(ci,1);
-JumpUp = C(find(a_counts>1));
-
-dummy.JumpDown = find((-gradient(Gap(Times)))>dummy.jump)+1;
-dummy.JumpDown = [dummy.JumpDown, find((gradient(Gap(Times)))>dummy.jump)-1;];
-[C,ai,ci]= unique(dummy.JumpDown);
-a_counts = accumarray(ci,1);
-JumpDown = C(find(a_counts>1));
+% dummy.jump = 20; %Number of pixels above which is considered a jump between frames
+% dummy.JumpUp = find((gradient(Gap(Times)))>dummy.jump)+1;
+% dummy.JumpUp = [dummy.JumpUp, find((-gradient(Gap(Times)))>dummy.jump)-1;];
+% [C,ai,ci]= unique(dummy.JumpUp);
+% a_counts = accumarray(ci,1);
+% JumpUp = C(find(a_counts>1));
+% 
+% dummy.JumpDown = find((-gradient(Gap(Times)))>dummy.jump)+1;
+% dummy.JumpDown = [dummy.JumpDown, find((gradient(Gap(Times)))>dummy.jump)-1;];
+% [C,ai,ci]= unique(dummy.JumpDown);
+% a_counts = accumarray(ci,1);
+% JumpDown = C(find(a_counts>1));
 

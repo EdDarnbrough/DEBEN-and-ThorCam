@@ -1,9 +1,26 @@
 %% Dr Ed Darnbrough University of Oxford Materials Department 2022
 % Load images and data then look at scaling
 [video, video_info, DebenData, Deben_info] = LoadDataAndVideo;
-[Zoom2mm, Full_Im, Zoomed_Im] = PixelScaling; 
+[Zoom2mm, Full_Im, Zoomed_Im] = PixelScalingErrFunc; 
 run QuickLook.m 
 
+%% Now improve the fitting if the data set is ok
+
+run FittedEdges.m
+
+%% Get sample height
+% Assume that the sample is darker than background and that the gap is and
+% is in the centre of your image
+% below the sample in the Zoomed_Im 
+% if not use dummy.flat = sum(Zoomed_Im(end:-1:1,:,1),2);
+
+dummy.half_size = 50; %only sample in the middle 100 pixels of the image
+dummy.middle = round(size(Zoomed_Im,1)./2)-dummy.half_size:round(size(Zoomed_Im,1)./2)+dummy.half_size; 
+dummy.height = ECFedgefit(Zoomed_Im,2,dummy.middle); %gap above sample
+dummy.gap = ECFedgefit(Zoomed_Im,2,50); %gap between grips
+
+video_info.Sample_height_px = range(dummy.gap)-range(dummy.height);
+Deben_info.Sample_height_mm = video_info.Sample_height_px./Zoom2mm;
 %% Convert all measurements into mm and then stress and strain (after you have sample height, see bottom)
 
 DebenData.Width_mm = interp1(video_info.FrameTime(Times),Width(Times)./Zoom2mm,DebenData.Sec);
@@ -25,27 +42,3 @@ ylabel('Stress (Pa)')
 dummy.elastic(1) =find(1-DebenData.Strain>0.04,1); dummy.elastic(2) =find(1-DebenData.Strain>0.14,1);
 [m,c,dm,dc,r] = linfit((1-DebenData.Strain(dummy.elastic(1):dummy.elastic(2))),DebenData.Stress_Pa(dummy.elastic(1):dummy.elastic(2)),0.1.*ones(1+range(dummy.elastic),1));
 
-%% Get sample height 
-% Assume that the sample is darker than background and that the gap is
-% below the sample in the Zoomed_Im 
-% if not use dummy.flat = sum(Zoomed_Im(end:-1:1,:,1),2);
-
-dummy.flat = sum(Zoomed_Im(:,:,1),2);
-dummy.window = 200;
-[a,b] = sort(dummy.flat(dummy.window+1:dummy.window:end)-dummy.flat(1:dummy.window:end-dummy.window), 'descend');
-for i = 1:2
-dummy.range = ((b(i)-1)*dummy.window:b(i)*dummy.window);dummy.step = 0.1;FuncShape = 600; 
-dummy.ResClose = Fitting(dummy,FuncShape);
-[~,dummy.posinx] = min(dummy.ResClose);
-dummy.pos(i) = dummy.range(1)+dummy.posinx.*dummy.step;
-end
-video_info.Sample_height_px = range(dummy.pos);
-Deben_info.Sample_height_mm = range(dummy.pos)./Zoom2mm;
-
-function Result = Fitting(dummy,FuncShape)
-c= 1;
-for i = dummy.range(1):dummy.step:dummy.range(end)
-    Result(c) = sum(abs(dummy.flat(dummy.range)-(0.5*range(dummy.flat(dummy.range)).*erf(([dummy.range]-i)./sqrt(FuncShape))'+min(dummy.flat(dummy.range))+range(dummy.flat(dummy.range))./2)));
-    c=c+1;
-end
-end
