@@ -34,7 +34,7 @@ DebenData.Strain = DebenData.Gap_mm./Deben_info.Sample_height_mm;
 %display result where negative strain is before contact and positive strain
 %is compressive
 figure, plot(1-DebenData.Strain, DebenData.Stress_Pa, 'o')
-title('Example Data from Sample 3 first loading')
+title('Example Data from PTFE 1')
 xlabel('Strain (-)')
 ylabel('Stress (Pa)')
 

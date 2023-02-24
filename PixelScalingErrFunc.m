@@ -19,6 +19,9 @@ dummy.middle = round(size(Full_Im,2)./2)-dummy.half_size:round(size(Full_Im,2)./
 check.Sample_width = ECFedgefit(Full_Im,1,dummy.middle);
 check.grip_width = ECFedgefit(Full_Im,1,1:1280);
 
+%for i = 1:10; check.grip_sections(i,:) = ECFedgefit(Full_Im(i*10:(i*10)+10,:,1),1,1:1280); end
+%Grip_width(1) = mean(range(check.grip_sections')); Grip_width(2) = std(range(check.grip_sections'));
+
 sample_width = diff(check.Sample_width); 
 grip_width = diff(check.grip_width);
 Pix2mm = grip_width./30; % assumed that grip is 30 mm across this gives the number of pix in 1 mm

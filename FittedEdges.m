@@ -22,6 +22,8 @@ for i = Times
 
     % Look horizontally for sample width
     WidthFine(i,:) = ECFedgefit(dummy.Im,1,1024); %looks at 1:1024
+    
+    %a=1; for j = ceil(GapFine(i,1)):floor(GapFine(i,2)); check.width_profile(a,:) = ECFedgefit(dummy.Im(j,:,1),1,1:1280); a=a+1; end
 
     if rem(max(Times)-i,2000)==0
         fprintf('%d left to complete \n', ((max(Times)-i))) % show progress *I like this to know everything is still running happily

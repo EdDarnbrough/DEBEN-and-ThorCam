@@ -7,6 +7,12 @@ FuncShape = 100; % this is how steep the ecr funciton is and can be changed base
 
 dummy.flat = sum(Im(:,dummy.region(1):dummy.region(2)),dimension).*(-1.5+dimension); % or dummy.flat = sum(Im(:,end-dummy.region:end),2);
 dummy.flat = dummy.flat-min(dummy.flat); %this strange work around is becuase for the grips the sample is light region and for width it is the dark region
+
+%Check if the sample is darker than the background or lighter, assuming
+%that the sample takes up less than half the width of the image
+TopDownFlatten = sum(Im(1:1024,1:1280,1),1)./range(1:1024);[m,c,~,~,~] = linfit(1:1280, TopDownFlatten, ones(1,1280));diff = (((1:1280).*m +c) -TopDownFlatten);
+if (sum(diff<0)>sum(diff>0)) == 0; dummy.flat = dummy.flat.*(-1) + max(dummy.flat) ; end
+
 [~,b] = max(dummy.flat); %take the maximum value as the middle of the image where there will be one edge before and one after
 %find first edge
 dummy.range = 1:b;dummy.step = 1;
