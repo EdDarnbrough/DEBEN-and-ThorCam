@@ -8,6 +8,10 @@ run QuickLook.m
 
 run FittedEdges.m
 
+%% Consider Barrelling rather than an average width
+
+run BarrellEdge.m 
+
 %% Get sample height
 % Assume that the sample is darker than background and that the gap is and
 % is in the centre of your image

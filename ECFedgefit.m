@@ -1,11 +1,12 @@
 %% Dr Ed Darnbrough University of Oxford Materials Department 2022
 %% Fitting an erf to the out of focus edge to get a sub-pixel resolution on the position
-function Edges = ECFedgefit(Im,dimension,region)
+function Edges = ECFedgefit(Im,dimension,region,barrel_width)
+if nargin == 3; barrel_width = 1:size(Im,1); end %Can use this to cycle through pixel by pixel for gettting the sample outline
 if length(region)==1; dummy.region(1) = 1; else; dummy.region(1) = region(1); end
 dummy.region(2) = region(end); %50; %number of pixels from the edge of the original image to take
 FuncShape = 100; % this is how steep the ecr funciton is and can be changed based on image defoucs. 
 
-dummy.flat = sum(Im(:,dummy.region(1):dummy.region(2)),dimension).*(-1.5+dimension); % or dummy.flat = sum(Im(:,end-dummy.region:end),2);
+dummy.flat = sum(Im(barrel_width,dummy.region(1):dummy.region(2)),dimension).*(-1.5+dimension); % or dummy.flat = sum(Im(:,end-dummy.region:end),2);
 dummy.flat = dummy.flat-min(dummy.flat); %this strange work around is becuase for the grips the sample is light region and for width it is the dark region
 
 %Check if the sample is darker than the background or lighter, assuming
@@ -50,6 +51,8 @@ end
 
 function Result = Fitting(dummy,FuncShape)
 c= 1;
+if dummy.range(1)<1; dummy.range(1)=1; shorten = find(dummy.range==1,1); dummy.range = dummy.range(shorten:end); end
+if dummy.range(end)>length(dummy.flat); shorten = find(dummy.range==length(dummy.flat),1); dummy.range = dummy.range(1:shorten); end
 for i = dummy.range(1):dummy.step:dummy.range(end)
     ECF = (0.5*range(dummy.flat(dummy.range)).*erf(([dummy.range]-i)./sqrt(FuncShape))'+min(dummy.flat(dummy.range))+range(dummy.flat(dummy.range))./2);
     Interest = reshape(dummy.flat(dummy.range), length(dummy.range),1);
@@ -60,6 +63,8 @@ end
 
 function Result = FittingBack(dummy,FuncShape)
 c= 1;
+if dummy.range(1)<1; dummy.range(1)=1; shorten = find(dummy.range==1,1); dummy.range = dummy.range(shorten:end); end
+if dummy.range(end)>length(dummy.flat); shorten = find(dummy.range==length(dummy.flat),1); dummy.range = dummy.range(1:shorten); end
 for i = dummy.range(1):dummy.step:dummy.range(end)
     ECF = (0.5*range(dummy.flat(dummy.range)).*erf(-([dummy.range]-i)./sqrt(FuncShape))'+min(dummy.flat(dummy.range))+range(dummy.flat(dummy.range))./2);
     Interest = reshape(dummy.flat(dummy.range), length(dummy.range),1);
