@@ -19,7 +19,7 @@ run BarrellEdge.m
 % if not use dummy.flat = sum(Zoomed_Im(end:-1:1,:,1),2);
 
 dummy.half_size = 50; %only sample in the middle 100 pixels of the image
-dummy.middle = round(size(Zoomed_Im,1)./2)-dummy.half_size:round(size(Zoomed_Im,1)./2)+dummy.half_size; 
+dummy.middle = round(size(Zoomed_Im,2)./2)-dummy.half_size:round(size(Zoomed_Im,2)./2)+dummy.half_size; 
 dummy.height = ECFedgefit(Zoomed_Im,2,dummy.middle); %gap above sample
 dummy.gap = ECFedgefit(Zoomed_Im,2,50); %gap between grips
 
@@ -38,11 +38,21 @@ DebenData.Strain = DebenData.Gap_mm./Deben_info.Sample_height_mm;
 %display result where negative strain is before contact and positive strain
 %is compressive
 figure, plot(1-DebenData.Strain, DebenData.Stress_Pa, 'o')
-title('Example Data from PTFE 1')
+title('Stress Strain')
 xlabel('Strain (-)')
 ylabel('Stress (Pa)')
 
+figure, plot(DebenData.Sec, DebenData.Stress_Pa, 'o')
+title('Stress Time')
+xlabel('Time (s)')
+ylabel('Stress (Pa)')
+
+figure, plot(DebenData.Sec, DebenData.Strain, 'o')
+title('Strain Time')
+xlabel('Time (s)')
+ylabel('Strain (-)')
+
 % Select linear section as elastic modulus start strain 0.04 end 0.14
-dummy.elastic(1) =find(1-DebenData.Strain>0.04,1); dummy.elastic(2) =find(1-DebenData.Strain>0.14,1);
-[m,c,dm,dc,r] = linfit((1-DebenData.Strain(dummy.elastic(1):dummy.elastic(2))),DebenData.Stress_Pa(dummy.elastic(1):dummy.elastic(2)),0.1.*ones(1+range(dummy.elastic),1));
+% dummy.elastic(1) =find(1-DebenData.Strain>0.04,1); dummy.elastic(2) =find(1-DebenData.Strain>0.14,1);
+% [m,c,dm,dc,r] = linfit((1-DebenData.Strain(dummy.elastic(1):dummy.elastic(2))),DebenData.Stress_Pa(dummy.elastic(1):dummy.elastic(2)),0.1.*ones(1+range(dummy.elastic),1));
 

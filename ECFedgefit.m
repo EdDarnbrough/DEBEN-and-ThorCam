@@ -5,14 +5,18 @@ if nargin == 3; barrel_width = 1:size(Im,1); end %Can use this to cycle through 
 if length(region)==1; dummy.region(1) = 1; else; dummy.region(1) = region(1); end
 dummy.region(2) = region(end); %50; %number of pixels from the edge of the original image to take
 FuncShape = 100; % this is how steep the ecr funciton is and can be changed based on image defoucs. 
+% Check which is the highest contrast image to use
+RGB = std(double(Im(:,round((size(Im,2)./2)),:))); [~,pos] = max(RGB);Im = Im(:,:,pos);
 
 dummy.flat = sum(Im(barrel_width,dummy.region(1):dummy.region(2)),dimension).*(-1.5+dimension); % or dummy.flat = sum(Im(:,end-dummy.region:end),2);
 dummy.flat = dummy.flat-min(dummy.flat); %this strange work around is becuase for the grips the sample is light region and for width it is the dark region
 
-%Check if the sample is darker than the background or lighter, assuming
-%that the sample takes up less than half the width of the image
-TopDownFlatten = sum(Im(1:1024,1:1280,1),1)./range(1:1024);[m,c,~,~,~] = linfit(1:1280, TopDownFlatten, ones(1,1280));diff = (((1:1280).*m +c) -TopDownFlatten);
-if (sum(diff<0)>sum(diff>0)) == 0; dummy.flat = dummy.flat.*(-1) + max(dummy.flat) ; end
+% if max(region)>100 %only if looking at sample not gap
+% %Check if the sample is darker than the background or lighter, assuming
+% %that the sample takes up less than half the width of the image
+% TopDownFlatten = sum(Im(1:1024,1:1280,1),1)./range(1:1024);[m,c,~,~,~] = linfit(1:1280, TopDownFlatten, ones(1,1280));diff = (((1:1280).*m +c) -TopDownFlatten);
+% if (sum(diff<0)>sum(diff>0)) == 0; dummy.flat = dummy.flat.*(-1) + max(dummy.flat) ; end
+% end
 
 [~,b] = max(dummy.flat); %take the maximum value as the middle of the image where there will be one edge before and one after
 %find first edge
@@ -46,6 +50,11 @@ dummy.ResClose = FittingBack(dummy,FuncShape);
 dummy.pos(2) = dummy.range(1)+dummy.posinx.*dummy.step;  
 
 Edges = dummy.pos; %save values
+% To check if interested
+% figure, hold on
+% plot(dummy.flat)
+% plot((0.5*range(dummy.flat(:)).*erf(((1:length(dummy.flat))-dummy.pos(1))./sqrt(FuncShape))'+min(dummy.flat(:))+range(dummy.flat(:))./2))
+% plot((0.5*range(dummy.flat(:)).*erf((-(1:length(dummy.flat))+dummy.pos(2))./sqrt(FuncShape))'+min(dummy.flat(:))+range(dummy.flat(:))./2))
 
 end
 
