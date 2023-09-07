@@ -5,7 +5,7 @@
 dummy.Decimate = 50; %1 in every X images looked at for speed 
 dummy.region = 50; %Region close to the boundary of the image to track in to avoid sample
 dummy.exclude = 25; %Assume that the total edge is contained within 2x this number of pixels 
-
+Precision2round = -1; %Can chose here to be -1 for 10, -2 for 100 etc. if doing every pixel is takeing too long
 % Generated from users selection the frames to look at, starting where
 % Quick look goes wrong
 Times = 1:dummy.Decimate:length(video_info.FrameTime);
@@ -24,7 +24,7 @@ for i = Times
     % Look horizontally for sample width
     if range(GapFine(i,:))>500; fprintf('The sample is %d pixels tall and might take a while \n', range(GapFine(i,:))); end
     a = 0;
-    Precision2round = -1; %Can chose here to be -1 for 10, -2 for 100 etc. if doing every pixel is takeing too long
+    
     for j = round(GapFine(i,1),Precision2round):10^(-Precision2round):round(GapFine(i,2),Precision2round)
         a = a+1;
         WidthFine(i,:,a) = ECFedgefit(dummy.Im,1,1280,j); %looks at all 1280 wide but only one pixel deep at a time
@@ -40,8 +40,8 @@ end
 beep
 %Gap = range(GapFine'); 
 %Width = range(WidthFine'); 
-Precision2round = 10^(-Precision2round);
-x = [0:Precision2round:Precision2round*(size(WidthFine,3)-1)];
+section_height = 10^(-Precision2round);
+x = [0:section_height:section_height*(size(WidthFine,3)-1)];
 figure, hold on
 for i = 1:40:length(Times)
 plot(reshape(WidthFine(Times(i),1,:),[],1), x, 'DisplayName', ['Left time ' num2str(video_info.FrameTime(Times(i)))])
@@ -49,12 +49,15 @@ plot(reshape(WidthFine(Times(i),2,:),[],1), x, 'DisplayName', ['Right time ' num
 end
 
 dummy.barrelwidth =range(WidthFine,2);
-dummy.barrelwidth =reshape(dummy.barrelwidth,[],43);
+dummy.barrelwidth =reshape(dummy.barrelwidth,[],size(dummy.barrelwidth,3));
 dummy.nanbarrel = dummy.barrelwidth; 
 dummy.nanbarrel(dummy.nanbarrel==0) = nan;
 [Minmum_pos,Minmum_val] = nanmin(dummy.nanbarrel(Times,:)');
 [Max_pos, Max_val] = max(dummy.barrelwidth(Times,:)');
 clear i j Precision2round a
+
+VolumePixelbyPixel = Volume_calc(WidthFine, Times, 1:length(Times),section_height);
+
 
 %% Barrelling maths 
 DR =  Max_val-Minmum_val; %DR = Rmax-Rtop; 
@@ -66,3 +69,7 @@ Pav_flow = ((8.*b.*R)./(H)).*( (1/12 + (H./(b.*R)).^2).^(3/2) - (H./(b.*R)).^3 -
 Load = DebenData.Force(1:10:end);
 Pav = Load(1:length(Pav_flow))'./(pi.*(Minmum_pos).^2); 
 flow = Pav./Pav_flow; 
+
+function [value] = range(varible)
+value = abs(max(varible)-min(varible));
+end

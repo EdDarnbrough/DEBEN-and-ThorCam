@@ -57,3 +57,7 @@ plot(video_info.FrameTime(Times),Contact(Times,:)','o', 'DisplayName','Contact')
 plot(video_info.FrameTime(Times),Contact(Times,1)'-Contact(Times,2)','o', 'DisplayName','Contact Difference')
 plot(video_info.FrameTime(Times),range(GapFine(Times,:)')+(Contact(Times,1)'-Contact(Times,2)'),'o', 'DisplayName','Sample Height')
 plot(video_info.FrameTime(Times),range(GapFine(Times,:)'),'o', 'DisplayName','Gap Height')
+
+function [value] = range(varible)
+value = abs(max(varible)-min(varible));
+end

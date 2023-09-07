@@ -81,3 +81,7 @@ for i = dummy.range(1):dummy.step:dummy.range(end)
     c=c+1;
 end
 end
+
+function [value] = range(varible)
+value = abs(max(varible)-min(varible));
+end
