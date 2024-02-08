@@ -3,9 +3,11 @@
 %%Quick.width = Width; Quick.gap = Gap; % save quick look things
 % User select
 dummy.Decimate = 50; %1 in every X images looked at for speed 
-dummy.region = 50; %Region close to the boundary of the image to track in to avoid sample
+dummy.regionv = [450:600]; %Vertical strip close to the boundary of the image to track grips in to avoid sample
 dummy.exclude = 25; %Assume that the total edge is contained within 2x this number of pixels 
 Precision2round = -1; %Can chose here to be -1 for 10, -2 for 100 etc. if doing every pixel is takeing too long
+horizontal_region = 1:1280;
+if ismember('location_horizontal', fields(grip)); horizontal_region = grip.location_horizontal; end %if a region containing the full view of the grips was previously set use that
 % Generated from users selection the frames to look at, starting where
 % Quick look goes wrong
 Times = 1:dummy.Decimate:length(video_info.FrameTime);
@@ -19,7 +21,7 @@ for i = Times
     previous = [0,0];
     % Look vertically for gap if no data
     if length(GapFine)<i
-        GapFine(i,:) = ECFedgefit(dummy.Im,2,50,previous);%looks at 1:50 pixels from im
+        GapFine(i,:) = ECFedgefit(dummy.Im,2,dummy.regionv,previous);%looks at 1:50 pixels from im
         previous = GapFine(i,:);
     end
     % Look horizontally for sample width
@@ -28,7 +30,7 @@ for i = Times
     previous = [0,0];
     for j = round(GapFine(i,1),Precision2round):10^(-Precision2round):round(GapFine(i,2),Precision2round)
         a = a+1;
-        WidthFine(i,:,a) = ECFedgefit(dummy.Im,1,1280,j,previous); %looks at all 1280 wide but only one pixel deep at a time
+        WidthFine(i,:,a) = ECFedgefit(dummy.Im,1,horizontal_region,j,previous); %looks at all of horizontal region but only one pixel deep at a time
         previous = WidthFine(i,:,a);
     end
     %a=1; for j = ceil(GapFine(i,1)):floor(GapFine(i,2)); check.width_profile(a,:) = ECFedgefit(dummy.Im(j,:,1),1,1:1280); a=a+1; end
@@ -50,12 +52,11 @@ plot(reshape(WidthFine(Times(i),1,:),[],1), x, 'DisplayName', ['Left time ' num2
 plot(reshape(WidthFine(Times(i),2,:),[],1), x, 'DisplayName', ['Right time ' num2str(video_info.FrameTime(Times(i)))])
 end
 
-dummy.barrelwidth =range(WidthFine,2);
-dummy.barrelwidth =reshape(dummy.barrelwidth,[],size(dummy.barrelwidth,3));
+dummy.barrelwidth =reshape(abs(WidthFine(:,1,:)-WidthFine(:,2,:)),[],size(WidthFine,3));
 dummy.nanbarrel = dummy.barrelwidth; 
 dummy.nanbarrel(dummy.nanbarrel==0) = nan;
-[Minmum_pos,Minmum_val] = nanmin(dummy.nanbarrel(Times,:)');
-[Max_pos, Max_val] = max(dummy.barrelwidth(Times,:)');
+[Min_value,Min_index] = min(dummy.nanbarrel(Times,:),[],2,'omitnan'); %value is the width in pixels
+[Max_value, Max_index] = max(dummy.barrelwidth(Times,:),[],2); %index is the number of pixels from the bottom that has the width value
 clear i j Precision2round a
 
 VolumePixelbyPixel = Volume_calc(WidthFine, Times, 1:length(Times),section_height);
