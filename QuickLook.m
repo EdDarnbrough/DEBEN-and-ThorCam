@@ -17,7 +17,7 @@ for i = Times
     dummy.Im = read(video,i); %costs ~0.6s per loop
 
     % Look vertically for gap
-    dummy.flat = sum(dummy.Im(dummy.top:dummy.bottom,dummy.region),2); %take the sum of all image in 1D for the region of interest
+    dummy.flat = sum(dummy.Im(dummy.top:dummy.bottom,dummy.regionv),2); %take the sum of all image in 1D for the region of interest
     dummy.points2consider = 1:length(dummy.flat); %first consider all the pixels
     % Loop to find edge and then ignore that area when looking for the
     % other edge
@@ -33,7 +33,7 @@ for i = Times
     dummy = rmfield(dummy, 'flat'); dummy = rmfield(dummy, 'points2consider');
 
     % Look horizontally for sample width
-    dummy.flat = sum(dummy.Im(:,:,1),1);
+    dummy.flat = sum(dummy.Im(dummy.regionh,:,1),1);
     dummy.points2consider = 1:length(dummy.flat); %first consider all the pixels
     for j = 1:2     % Loop to find edge and then ignore that area when looking for the other edge
         [~,dummy.inx_h(i,j)] = min(abs(dummy.flat(dummy.points2consider) - (min(dummy.flat)+range(dummy.flat)/2)));
