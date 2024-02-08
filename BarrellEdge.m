@@ -16,18 +16,20 @@ dummy.inx_v = zeros(max(Times),2); %empty generated for speed of loop
 for i = Times
     %read in frame
     dummy.Im = read(video,i); %costs ~0.6s per loop
-    
+    previous = [0,0];
     % Look vertically for gap if no data
     if length(GapFine)<i
-        GapFine(i,:) = ECFedgefit(dummy.Im,2,50); %looks at 1:50 pixels from im
+        GapFine(i,:) = ECFedgefit(dummy.Im,2,50,previous);%looks at 1:50 pixels from im
+        previous = GapFine(i,:);
     end
     % Look horizontally for sample width
     if range(GapFine(i,:))>500; fprintf('The sample is %d pixels tall and might take a while \n', range(GapFine(i,:))); end
     a = 0;
-    
+    previous = [0,0];
     for j = round(GapFine(i,1),Precision2round):10^(-Precision2round):round(GapFine(i,2),Precision2round)
         a = a+1;
-        WidthFine(i,:,a) = ECFedgefit(dummy.Im,1,1280,j); %looks at all 1280 wide but only one pixel deep at a time
+        WidthFine(i,:,a) = ECFedgefit(dummy.Im,1,1280,j,previous); %looks at all 1280 wide but only one pixel deep at a time
+        previous = WidthFine(i,:,a);
     end
     %a=1; for j = ceil(GapFine(i,1)):floor(GapFine(i,2)); check.width_profile(a,:) = ECFedgefit(dummy.Im(j,:,1),1,1:1280); a=a+1; end
     

@@ -1,6 +1,6 @@
 %% Dr Ed Darnbrough University of Oxford Materials Department 2022
 %% Fitting an erf to the out of focus edge to get a sub-pixel resolution on the position
-function Edges = ECFedgefit(Im,dimension,region,barrel_width)
+function Edges = ECFedgefit(Im,dimension,region,barrel_width,previous)
 if nargin == 3; barrel_width = 1:size(Im,1); end %Can use this to cycle through pixel by pixel for gettting the sample outline
 if length(region)==1; dummy.region(1) = 1; else; dummy.region(1) = region(1); end
 dummy.region(2) = region(end); %50; %number of pixels from the edge of the original image to take
@@ -25,7 +25,13 @@ dummy.Res = Fitting(dummy,FuncShape);
 %figure, plot(dummy.range,dummy.Res, 'o') use for diagnosing problems but
 %comment out if running loop 
 
-[~,a] = min(dummy.Res); 
+[~,a] = min(dummy.Res);
+if abs(a-previous(1))>10 
+    dummy.flat = movmedian(movmedian(dummy.flat,10),10); %do this to remove any spikes that could have ruined the fitting
+    dummy.Res = Fitting(dummy,FuncShape);
+    [~,a] = min(dummy.Res); %only does this once so if it persists it is real
+end
+
 dummy.range = a-10:a+10;dummy.step = 0.1;
 if dummy.range(1)<1; dummy.range = 1:a+10; end
 dummy.ResClose = Fitting(dummy,FuncShape);
@@ -41,7 +47,12 @@ dummy.range = b:length(dummy.flat);dummy.step = 1;
 dummy.Res = FittingBack(dummy,FuncShape);
 %figure, plot(dummy.range,dummy.Res, 'o')
 
-[~,a] = min(dummy.Res); 
+[~,a] = min(dummy.Res);
+if abs(a-previous(2))>10 
+    dummy.flat = movmedian(dummy.flat,10); %do this to remove any spikes that could have ruined the fitting
+    dummy.Res = FittingBack(dummy,FuncShape);
+    [~,a] = min(dummy.Res); %only does this once so if it persists it is real
+end
 dummy.range = b+a-10:b+a+10;dummy.step = 0.1;
 dummy.ResClose = FittingBack(dummy,FuncShape);
 %hold on; plot(min(dummy.range):dummy.step:max(dummy.range),dummy.ResClose, 'x')
