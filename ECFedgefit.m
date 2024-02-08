@@ -1,7 +1,8 @@
-%% Dr Ed Darnbrough University of Oxford Materials Department 2022
+%% Dr Ed Darnbrough University of Oxford Materials Department 2024
 %% Fitting an erf to the out of focus edge to get a sub-pixel resolution on the position
 function Edges = ECFedgefit(Im,dimension,region,barrel_width,previous)
-if nargin == 3; barrel_width = 1:size(Im,1); end %Can use this to cycle through pixel by pixel for gettting the sample outline
+if nargin == 3; barrel_width = 1:size(Im,1); previous = [0,0]; end %Can use this to cycle through pixel by pixel for gettting the sample outline and to do fitting of neighbouring regions following an edge
+if nargin == 4; previous = [0,0]; end
 if length(region)==1; dummy.region(1) = 1; else; dummy.region(1) = region(1); end
 dummy.region(2) = region(end); %50; %number of pixels from the edge of the original image to take
 FuncShape = 100; % this is how steep the ecr funciton is and can be changed based on image defoucs. 
