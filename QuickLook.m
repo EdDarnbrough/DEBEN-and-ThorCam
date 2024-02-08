@@ -1,10 +1,11 @@
-%% Dr Ed Darnbrough University of Oxford Materials Department 2022
+%% Dr Ed Darnbrough University of Oxford Materials Department 2024
 %% First pass to get rough vertical gap and sample width
 % User select
 dummy.Decimate = 25; %1 in every X images looked at for speed 
-dummy.region = 50; %Region close to the boundary of the image to track in to avoid sample
-dummy.exclude = 25; %Assume that the total edge is contained within 2x this number of pixels 
-dummy.top = 10; dummy.bottom = video.Height; %use these if needed to ignore things at the top or bottom of your frame
+dummy.regionv = [450:600]; %Vertical strip close to the boundary of the image to track grips in to avoid sample
+dummy.regionh = [400:1400]; %Horizontal strip containing mainly the sample not the grips 
+dummy.exclude = 10; %Assume that the total edge is contained within 2x this number of pixels 
+dummy.top = 500; dummy.bottom = video.Height; %use these if needed to ignore things at the top or bottom of your frame
 % Generated from users selection the frames to look at
 Times = 1:dummy.Decimate:length(video_info.FrameTime);
 dummy.inx_h = zeros(max(Times),2); %empty generated for speed of loop
@@ -16,14 +17,16 @@ for i = Times
     dummy.Im = read(video,i); %costs ~0.6s per loop
 
     % Look vertically for gap
-    dummy.flat = sum(dummy.Im(dummy.top:dummy.bottom,end-dummy.region:end),2); %take the sum of all image in 1D for the region of interest
+    dummy.flat = sum(dummy.Im(dummy.top:dummy.bottom,dummy.region),2); %take the sum of all image in 1D for the region of interest
     dummy.points2consider = 1:length(dummy.flat); %first consider all the pixels
     % Loop to find edge and then ignore that area when looking for the
     % other edge
     for j = 1:2
         % Looking for points that are closest to half of the range of all values plus the minimum to give a middle value that will equate to half way up the change in intensity seen at an edge.
         [~,dummy.inx_v(i,j)] = min(abs(dummy.flat(dummy.points2consider) - (min(dummy.flat)+range(dummy.flat)/2))); 
-        dummy.points2consider = [1:dummy.inx_v(i,j)-dummy.exclude,dummy.inx_v(i,j)+dummy.exclude:length(dummy.points2consider)]; %once found now ignore this region to look for the other edge. 
+        dummy.points2consider = [1:dummy.inx_v(i,j)-dummy.exclude*4,dummy.inx_v(i,j)+dummy.exclude*4:length(dummy.points2consider)]; %once found now ignore this region to look for the other edge. 
+        %this edge looks chunkier than the width so I artifically increase
+        %the exclusion zone
     end
     %remove dummies
     dummy.VertMap(:,i) = dummy.flat;
@@ -34,9 +37,7 @@ for i = Times
     dummy.points2consider = 1:length(dummy.flat); %first consider all the pixels
     for j = 1:2     % Loop to find edge and then ignore that area when looking for the other edge
         [~,dummy.inx_h(i,j)] = min(abs(dummy.flat(dummy.points2consider) - (min(dummy.flat)+range(dummy.flat)/2)));
-        dummy.points2consider = [1:dummy.inx_h(i,j)-dummy.exclude*2,dummy.inx_h(i,j)+dummy.exclude*2:length(dummy.points2consider)];
-        %allow horizontal edges (the sample) to twice the size of the out
-        %of focus grip edge in vertical
+        dummy.points2consider = [1:dummy.inx_h(i,j)-dummy.exclude,dummy.inx_h(i,j)+dummy.exclude:length(dummy.points2consider)];
     end
     %remove dummies
     dummy.HoriMap(:,i) = dummy.flat;
