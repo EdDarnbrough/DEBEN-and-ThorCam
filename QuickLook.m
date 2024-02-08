@@ -73,6 +73,10 @@ title('Measurements made on each processed frame')
 ylabel('Distance in pixels')
 xlabel('Experiment time (s)')
 
+function [value] = range(varible)
+value = abs(max(varible)-min(varible));
+end
+
 %% Looking to isolate the erronous values - not needed
 
 % dummy.jump = 20; %Number of pixels above which is considered a jump between frames
