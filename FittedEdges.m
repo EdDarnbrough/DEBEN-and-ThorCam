@@ -1,4 +1,4 @@
-%% Dr Ed Darnbrough University of Oxford Materials Department 2022
+%% Dr Ed Darnbrough University of Oxford Materials Department 2024
 %% Using ECF fit to find a better vertical gap and sample width
 Quick.width = Width; Quick.gap = Gap; % save quick look things
 % User select
@@ -22,21 +22,25 @@ for i = Times
     %im for just a single value of fit, below takes 5 measures to find mean
     %and error
     limits = [1,11,21,31,41,51];
-    for a= 1:5
+    if ismember('regionv', fields(dummy)); limits = ceil(decimate(dummy.regionv,10)); end %if a region containing the grip without sample was previously set use that
+    %ceil used to avoid trying to find the 0 index
+    for a= 1:length(limits)-1
         GapPos(a,:) = ECFedgefit(dummy.Im,2,[limits(a):limits(a+1)]);
     end
     GapFine(i,:) = mean(GapPos); GapFineStandardErr(i,:) = std(GapPos)./sqrt(length(GapPos));
 
     % Look horizontally for sample width
-    WidthFine(i,:) = ECFedgefit(dummy.Im,1,1280,[floor(GapFine(i,1)):ceil(GapFine(i,2))]); %looks at 1:1024 and the gap between the grips
+    horizontal_region = 1:1280;
+    if ismember('location_horizontal', fields(grip)); horizontal_region = grip.location_horizontal; end %if a region containing the full view of the grips was previously set use that
+    WidthFine(i,:) = ECFedgefit(dummy.Im,1,horizontal_region,[floor(GapFine(i,1)):ceil(GapFine(i,2))]); 
     
     %a=1; for j = ceil(GapFine(i,1)):floor(GapFine(i,2)); check.width_profile(a,:) = ECFedgefit(dummy.Im(j,:,1),1,1:1280); a=a+1; end
     
     % Look where the sample is for any gap above i.e. is the platen in
     % contact? 
-    Contact(i,:) = ECFedgefit(dummy.Im,2,[floor(WidthFine(i,1)):ceil(WidthFine(i,2))]);
+    %Contact(i,:) = ECFedgefit(dummy.Im,2,[floor(WidthFine(i,1)):ceil(WidthFine(i,2))]);
 
-    if rem(max(Times)-i,2000)==0
+    if rem(max(Times)-i,500)==0
         fprintf('%d left to complete \n', ((max(Times)-i))) % show progress *I like this to know everything is still running happily
     end
 end
@@ -45,18 +49,19 @@ Gap = range(GapFine');
 Width = range(WidthFine'); 
 
 figure, hold on
+title('Comparing quick look with error function edge fitting')
 plot(video_info.FrameTime(Times),range(GapFine(Times,:)'),'o', 'DisplayName','GapFine')
 plot(video_info.FrameTime(Times),Quick.gap(Times),'o', 'DisplayName','Gapquick')
 plot(video_info.FrameTime(Times),Quick.width(Times),'o', 'DisplayName','Widthquick')
 plot(video_info.FrameTime(Times),range(WidthFine(Times,:)'),'o', 'DisplayName','WidthFine')
 errorbar(video_info.FrameTime(Times),range(GapFine(Times,:)'), mean(GapFineStandardErr(Times,:)'),'o', 'DisplayName','GapFineWithErr')
 
-figure, hold on 
-plot(video_info.FrameTime(Times),GapFine(Times,:)','o', 'DisplayName','GapFine')
-plot(video_info.FrameTime(Times),Contact(Times,:)','o', 'DisplayName','Contact')
-plot(video_info.FrameTime(Times),Contact(Times,1)'-Contact(Times,2)','o', 'DisplayName','Contact Difference')
-plot(video_info.FrameTime(Times),range(GapFine(Times,:)')+(Contact(Times,1)'-Contact(Times,2)'),'o', 'DisplayName','Sample Height')
-plot(video_info.FrameTime(Times),range(GapFine(Times,:)'),'o', 'DisplayName','Gap Height')
+% figure, hold on 
+% plot(video_info.FrameTime(Times),GapFine(Times,:)','o', 'DisplayName','GapFine')
+% plot(video_info.FrameTime(Times),Contact(Times,:)','o', 'DisplayName','Contact')
+% plot(video_info.FrameTime(Times),Contact(Times,1)'-Contact(Times,2)','o', 'DisplayName','Contact Difference')
+% plot(video_info.FrameTime(Times),range(GapFine(Times,:)')+(Contact(Times,1)'-Contact(Times,2)'),'o', 'DisplayName','Sample Height')
+% plot(video_info.FrameTime(Times),range(GapFine(Times,:)'),'o', 'DisplayName','Gap Height')
 
 function [value] = range(varible)
 value = abs(max(varible)-min(varible));
