@@ -78,7 +78,7 @@ cd(StartingFolder) %return
 [~, ~, ~, video_info.h, video_info.m, video_info.s] = datevec(video_info.datenum);
 [~, ~, ~, Tensile_info.h, Tensile_info.m, Tensile_info.s] = datevec(Tensile_info.datenum);
 video_info.Time_ofset_s = (Tensile_info.h*3600+ Tensile_info.m*60 + Tensile_info.s)-(video_info.h*3600+ video_info.m*60+ video_info.s); %if positive then data longer than video, if negative video longer than data
-video_info.starttime = max(TensileData.Time) - (video.Duration+video_info.Time_ofset_s);
+video_info.starttime = max(TensileData.Time) - (video.NumFrames/video.FrameRate+video_info.Time_ofset_s);
 video_info.FrameTime = ([1:video.NumFrames]./video.FrameRate)+video_info.starttime;
 
 end
