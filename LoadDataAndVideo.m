@@ -20,7 +20,7 @@ cd(StartingFolder) %return
 
 if isequal(file,0)
    disp('User selected Cancel');
-elseif strcmp(file(end-2:end),'csv') == 1
+elseif strcmp(file(end-2:end),'csv') == 1 | strcmp(file(end-3:end),'xlsx') == 1
    disp(['User selected ', fullfile(path,file)]);
    cd(path)
    %% Set up the Import Options and import the data
