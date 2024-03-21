@@ -4,10 +4,20 @@
 % Getting scaling
 Starting_frame = read(video,1);
 grip.location_horizontal = 200:1200; %pixel range containing full grip width
-grip.location_vertical = 1:600; %pixel range containing just top grip
+grip.location_vertical = 800:1050; %pixel range containing just top grip
+VisuliseRegionOfInterest(Starting_frame, grip.location_vertical, grip.location_horizontal)
+title('Region of grips used to scale pixels')
 grip.width_px = diff(ECFedgefit(Starting_frame,1,grip.location_horizontal,grip.location_vertical)); 
 grip.width_mm = 16; %measured by user with a sensible instrument 
 Zoom2mm = grip.width_px/grip.width_mm; 
+%% User selection of rgeions of interest
+dummy.regionv = [300:500]; %Vertical strip close to the boundary of the image to track grips in to avoid sample
+dummy.regionh = [1150:1700]; %Horizontal strip containing mainly the sample not the grips 
+dummy.top = 800; dummy.bottom = video.Height; %use these if needed to ignore things at the top or bottom of your frame
+VisuliseRegionOfInterest(Starting_frame, [dummy.top,dummy.bottom], dummy.regionv)
+title('Region for tracking grips')
+VisuliseRegionOfInterest(Starting_frame, dummy.regionh, [1,video.Width])
+title('Region for tracking sample width')
 %%
 run QuickLook.m 
 

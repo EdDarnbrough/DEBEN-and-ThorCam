@@ -2,10 +2,8 @@
 %% First pass to get rough vertical gap and sample width
 % User select
 dummy.Decimate = 25; %1 in every X images looked at for speed 
-dummy.regionv = [450:600]; %Vertical strip close to the boundary of the image to track grips in to avoid sample
-dummy.regionh = [400:1400]; %Horizontal strip containing mainly the sample not the grips 
 dummy.exclude = 10; %Assume that the total edge is contained within 2x this number of pixels 
-dummy.top = 500; dummy.bottom = video.Height; %use these if needed to ignore things at the top or bottom of your frame
+
 % Generated from users selection the frames to look at
 Times = 1:dummy.Decimate:length(video_info.FrameTime);
 dummy.inx_h = zeros(max(Times),2); %empty generated for speed of loop
