@@ -63,15 +63,15 @@ VolumePixelbyPixel = Volume_calc(WidthFine, Times, 1:length(Times),section_heigh
 
 
 %% Barrelling maths 
-DR =  Max_val-Minmum_val; %DR = Rmax-Rtop; 
-m= [0.1;0.5;0.9]; 
-H = range(GapFine(Times,:)'); 
-R = nanmean(dummy.nanbarrel(Times,:)');
-b = (4.*m./sqrt(3)) ./ ((R./H)+(2.*m/(3.*sqrt(3))));
-Pav_flow = ((8.*b.*R)./(H)).*( (1/12 + (H./(b.*R)).^2).^(3/2) - (H./(b.*R)).^3 - ((m./(24.*sqrt(3))).*(exp(-b./2)./(exp(-2./b)-1))) );
-Load = DebenData.Force(1:10:end);
-Pav = Load(1:length(Pav_flow))'./(pi.*(Minmum_pos).^2); 
-flow = Pav./Pav_flow; 
+% DR =  Max_val-Minmum_val; %DR = Rmax-Rtop; 
+% m= [0.1;0.5;0.9]; 
+% H = range(GapFine(Times,:)'); 
+% R = nanmean(dummy.nanbarrel(Times,:)');
+% b = (4.*m./sqrt(3)) ./ ((R./H)+(2.*m/(3.*sqrt(3))));
+% Pav_flow = ((8.*b.*R)./(H)).*( (1/12 + (H./(b.*R)).^2).^(3/2) - (H./(b.*R)).^3 - ((m./(24.*sqrt(3))).*(exp(-b./2)./(exp(-2./b)-1))) );
+% Load = DebenData.Force(1:10:end);
+% Pav = Load(1:length(Pav_flow))'./(pi.*(Minmum_pos).^2); 
+% flow = Pav./Pav_flow; 
 
 function [value] = range(varible)
 value = abs(max(varible)-min(varible));
