@@ -28,7 +28,7 @@ for i = Times
     if range(GapFine(i,:))>500; fprintf('The sample is %d pixels tall and might take a while \n', range(GapFine(i,:))); end
     a = 0;
     previous = [0,0];
-    for j = round(GapFine(i,1),Precision2round):10^(-Precision2round):round(GapFine(i,2),Precision2round)
+   for j = ceil((0.1+GapFine(i,1))./10^(-Precision2round))*10^(-Precision2round):10^(-Precision2round):floor(GapFine(i,2)./10^(-Precision2round))*10^(-Precision2round)
         a = a+1;
         WidthFine(i,:,a) = ECFedgefit(dummy.Im,1,horizontal_region,j,previous); %looks at all of horizontal region but only one pixel deep at a time
         previous = WidthFine(i,:,a);
