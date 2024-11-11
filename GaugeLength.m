@@ -6,24 +6,24 @@
 SampleWidth = dummy.barrelwidth; 
 for j =1:length(Times)
     Halfway = round(size(SampleWidth,2)/2);
-    
+    WindowSize = 3;
     spread = 0.1;
-    i = Halfway+3;
+    i = Halfway+WindowSize;
     Difference = 0;
     WindowWidth = 100;
     while i<size(SampleWidth,2) && Difference<spread*WindowWidth
-        WindowWidth = median(SampleWidth(Times(j),i-3:i));
+        WindowWidth = median(SampleWidth(Times(j),i-WindowSize:i));
         Difference = SampleWidth(Times(j),i+1)- WindowWidth; 
         i = i+1;
     end
     %fprintf(['stopped on ' num2str(i) '\n'])
     UpperLower(1,j)= i;
     
-    i = Halfway-3;
+    i = Halfway-WindowSize;
     Difference = 0;
     WindowWidth = 100;
     while i>1 && Difference<spread*WindowWidth
-        WindowWidth = median(SampleWidth(Times(j),i:i+3));
+        WindowWidth = median(SampleWidth(Times(j),i:i+WindowSize));
         Difference = SampleWidth(Times(j),i-1)- WindowWidth; 
         i = i-1;
     end
