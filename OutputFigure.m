@@ -48,9 +48,11 @@ TensileData.Width_mm = interp1(video_info.FrameTime(Times),Width(Times)./Zoom2mm
 
 TensileData.Gap_mm = interp1(video_info.FrameTime(Times),Gap(Times)./Zoom2mm,TensileData.Time);
 
-TensileData.Stress_Pa = TensileData.Force./((TensileData.Width_mm.*10^(-3)).^2); %assumed square sectioned
+TensileData.Stress_Pa = TensileData.Force./((TensileData.Width_mm.*10^(-3)).^2); %assumed square sectioned . . .  
+%ie that the sample thickness not visable to the viewer starts as the same dimension as the visable width and that the poisson's ratio is the same during deformation.
 
-TensileData.Strain = TensileData.Gap_mm./min(TensileData.Gap_mm,[],'omitnan'); %1D strain
+TensileData.Strain = TensileData.Gap_mm./min(TensileData.Gap_mm,[],'omitnan'); %1D strain . . .
+%only tensile strain in the loading direction is considered in the measure of strain in the sample 
 
 %display result where negative strain is before contact and positive strain
 %is tensile
